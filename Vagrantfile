@@ -12,8 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "ubuntu/bionic64"
-  config.vm.box_version = "~> 20200304.0.0"
+  config.vm.box = "ubuntu/xenial64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -68,14 +67,18 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     systemctl disable apt-daily.service
     systemctl disable apt-daily.timer
-    sudo apt-get update
-    sudo apt-get install -y python3-pip zip
-    sudo pip3 install virtualenv
+    apt-get update
+    apt-get install software-properties-common
+    add-apt-repository ppa:deadsnakes/ppa -y
+    apt-get update
+    apt-get install python3.7 python3.7-venv zip -y
+    python3.7 -m pip install --upgrade pip
     touch /home/vagrant/.bash_aliases
     if ! grep -q PYTHON_ALIAS_ADDED /home/vagrant/.bash_aliases; then
       echo "# PYTHON_ALIAS_ADDED" >> /home/vagrant/.bash_aliases
-      echo "alias python='python3'" >> /home/vagrant/.bash_aliases
-      echo "alias pip='pip3'" >> /home/vagrant/.bash_aliases
+      echo "alias python='python3.7'" >> /home/vagrant/.bash_aliases
+      echo "alias pip='python3.7 -m pip'" >> /home/vagrant/.bash_aliases
+      echo "alias virtualenv='python3.7 -m venv'" >> /home/vagrant/.bash_aliases
     fi
   SHELL
 end
